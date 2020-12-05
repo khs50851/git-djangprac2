@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load humanize %} <!-- 여러 필터를 사용 가능 settings에 활성화해야함-->
 {% block contents %}
 <div class="row mt-5">
     <div class="col-12 text-center">
-        회원가입
+        상품등록
     </div>
 </div>
 <div class="row mt-5">
@@ -17,16 +18,22 @@
             {% for field in form %}
             <div class="form-group">
                 <label for = "{{field.id_for_label}}">{{field.label}}</label>
+                {% ifequal field.name 'description' %}
+                <textarea class="form-control" name="{{field.name}}" id="field.id_for_label"></textarea>
+                {% else %}
                 <input type="{{field.field.widget.input_type}}" class="form-control" id="{{field.id_for_label}}" placeholder="{{field.label}}" name="{{field.name}}"/>
+                {% endifequal %}
             </div>
             {% if field.errors %}
             <span style="color:red">{{field.errors}}</span>
             {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-primary">등록</button>
+            <button type="submit" class="btn btn-primary">상품등록</button>
         </form>
     </div>
 </div>
 
 
+
+<!--object_list 이렇게 쿼리셋 형태로 출력 -->
 {% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load humanize %} <!-- 여러 필터를 사용 가능 settings에 활성화해야함-->
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12">
+        <table class="table table-light">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">상품명</th>
+                    <th scope="col">가격</th>
+                    <th scope="col">등록날짜</th>
+                </tr>
+            </thead>
+            <tbody class="text-dark">
+                {% for product in product_list %}
+                <tr>
+                    <th scope="row">{{product.id}}</th>
+                    <th>{{product.name}}</th>
+                    <th>{{product.price|intcomma}} 원</th> <!--세자리수마다 콤마들어감-->
+                    <th>{{product.regdate|date:'Y-m-d H:i'}}</th>
+                    <!--  -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<!--object_list 이렇게 쿼리셋 형태로 출력 -->
+{% endblock %}
