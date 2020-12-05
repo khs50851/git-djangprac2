@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load humanize %} <!-- 여러 필터를 사용 가능 settings에 활성화해야함-->
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card" style="width: 100%;">
+            <div class="card-body">
+                <h5 class="card-title">{{product.name}}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <form>
+                        
+                    </form>
+                </li>
+                <li class="list-group-item">가격 : {{product.price|intcomma}} 원 </li><!--세자리수마다 콤마들어감-->
+                <li class="list-group-item">등록날짜 : {{product.regdate|date:'Y-m-d H:i'}} </li>
+                <li class="list-group-item">{{product.description|safe}}</li> <!-- 이 태그를 텍스트가 아니라 태그 자체로 사용하려면 필터를 걸어야함 safe 이렇게하면 html코드로 만들어짐 -->
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <a href="/product/">목록보기</a>
+    </div>
+</div>
+
+
+
+<!--object_list 이렇게 쿼리셋 형태로 출력 -->
+{% endblock %}
