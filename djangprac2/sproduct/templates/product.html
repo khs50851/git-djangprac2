@@ -1,5 +1,32 @@
 {% extends "base.html" %}
 {% load humanize %} <!-- 여러 필터를 사용 가능 settings에 활성화해야함-->
+{% block header %}
+<script>
+    function product_detail(id){
+        $.ajax({
+            url: "/api/product/"+id,
+            success: function( result ) {
+                $("#product-"+id).popover({
+                    html:true, // 내가 이 컨텐츠를 쓸껀데 html 태그를 사용할거다라는 속성값
+                    content:result.name+"<br/>"+result.price
+                }).popover('show');
+        }
+    });
+    }
+    function product_leave(id){
+        $("#product-"+id).popover('hide');
+    }
+    $(document).ready(function(){
+        $.ajax({
+            url: "/api/product",
+            success: function( result ) {
+                console.log(result)
+        }
+    });
+});
+   
+</script>
+{% endblock %}
 {% block contents %}
 <div class="row mt-5">
     <div class="col-12">
@@ -16,7 +43,8 @@
                 {% for product in product_list %}
                 <tr>
                     <th scope="row">{{product.id}}</th>
-                    <th><a href="/product/{{product.id}}">{{product.name}}</a></th>
+                    <th><a id="product-{{product.id}}" onmouseenter="product_detail({{product.id}});" onmouseleave="product_leave({{product.id}});"
+                         href="/product/{{product.id}}">{{product.name}}</a></th>
                     <th>{{product.price|intcomma}} 원</th> <!--세자리수마다 콤마들어감-->
                     <th>{{product.regdate|date:'Y-m-d H:i'}}</th>
                     <!--  -->

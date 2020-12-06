@@ -2,11 +2,49 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 from django.utils.decorators import method_decorator
+from rest_framework import generics
+from rest_framework import mixins
+from .serializers import ProductSerializer
+
 from .models import Sproduct
 from .forms import RegisterForm
 from sorder.forms import RegisterForm as SorderForm
 from suser.decorators import admin_required
 # Create your views here.
+
+# rest를 이용한 뷰
+
+
+class ProductListAIP(generics.GenericAPIView, mixins.ListModelMixin):  # mixin은 하나의 컴포넌트
+    # 만약 이 클래스뷰안에서 get메소드와 post메소드를 제공할건데
+    # get에서는 list형태의 api만들고싶고 post는 생성에 대한 api를 만들고싶다?
+    # 두가지 기능중에 get에 대한 mixin 클래스를 가져와 상속
+    # post에 mixin 클래스를 가져와 상속받음
+
+    # 어떤 데이터를 가지고할지 명시해야함 앞에서 만든 시리얼라이저랑 쿼리셋으로 지정해서 명시
+
+    serializer_class = ProductSerializer  # 데이터에대한 검증을 해야해서 시리얼라이저를 등록함
+
+    def get_queryset(self):
+        return Sproduct.objects.all().order_by('id')  # 데이터 가져옴
+
+    def get(self, request, *args, **kwargs):  # 저 믹스인 안에 함수가 만들어져있음 겟함수안에서 리스트를 호출함
+        return self.list(request, *args, **kwargs)
+
+
+# mixin은 하나의 컴포넌트 # 상세페이지를 위한 mixin
+class ProductDetailAIP(generics.GenericAPIView, mixins.RetrieveModelMixin):
+
+    serializer_class = ProductSerializer  # 데이터에대한 검증을 해야해서 시리얼라이저를 등록함
+
+    def get_queryset(self):
+        # 왜 상세보기인데 all이냐?
+        return Sproduct.objects.all().order_by('id')  # 데이터 가져옴
+    # 이 믹스인을 상속받고 겟을 사용하면 url에서 pk값을 연결해줘야함
+    # 그럼 이 쿼리셋 안에서 해당 pk를 가지고있는 상품만 꺼내서 줌
+
+    def get(self, request, *args, **kwargs):  # 저 믹스인 안에 함수가 만들어져있음 겟함수안에서 리스트를 호출함
+        return self.retrieve(request, *args, **kwargs)
 
 
 class ProductList(ListView):

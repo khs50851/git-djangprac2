@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from suser.views import index, RegisterView, LoginView, logout
-from sproduct.views import ProductList, ProductCreate, ProductDetail
+from sproduct.views import ProductList, ProductCreate, ProductDetail, ProductListAIP, ProductDetailAIP
 from sorder.views import OrderCreate, OrderList
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +29,7 @@ urlpatterns = [
     path('product/<int:pk>/', ProductDetail.as_view()),
     path('order/create/', OrderCreate.as_view()),
     path('order/', OrderList.as_view()),
+    path('api/product/', ProductListAIP.as_view()),
+    path('api/product/<int:pk>/', ProductDetailAIP.as_view()),
 
 ]
