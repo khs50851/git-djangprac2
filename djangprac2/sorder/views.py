@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from .models import Sorder
 from .forms import RegisterForm
 from suser.decorators import login_required
-
+from sproduct.models import Sproduct
+from suser.models import Suser
 # Create your views here.
 
 
@@ -14,9 +16,24 @@ class OrderCreate(FormView):
     form_class = RegisterForm
     success_url = "/product/"
 
+    def form_valid(self, form):
+        with transaction.atomic():
+            prod = Sproduct.objects.get(pk=form.data.get('product'))
+            sorder = Sorder(
+                # 참조키이기때문에 그 모델을 임포트 해야함
+                quantity=form.data.get('quantity'),
+                product=prod,
+                suser=Suser.objects.get(email=self.request.session.get('user'))
+            )
+            sorder.save()
+            prod.stock -= int(form.data.get('quantity'))
+            prod.save()
+
+        return super().form_valid(form)
     # 실패했을경우 다시 상품 상세보기페이지로 들어오게
+
     def form_invalid(self, form):
-        return redirect('/product/'+str(form.product))
+        return redirect('/product/'+str(form.data.get('product')))
 
     def get_form_kwargs(self, **kwargs):  # 폼을 생성할때 어떤 인자값을 전달해서 만들건지를 결정하는 함수
         kw = super().get_form_kwargs(**kwargs)
@@ -28,7 +45,7 @@ class OrderCreate(FormView):
 
 
 # url에 접근했을때 클래스를 호출해주는 함수는 dispatch임
-@method_decorator(login_required, name='dispatch')
+@ method_decorator(login_required, name='dispatch')
 class OrderList(ListView):
     model = Sorder  # 그냥 모델로만 하면 전체 회원의 주문목록이 나옴
     # 세션으로 사용자 정보를 받아와야함

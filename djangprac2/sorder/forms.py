@@ -27,28 +27,12 @@ class RegisterForm(forms.Form):
         cleaned_data = super().clean()
         quantity = cleaned_data.get('quantity')
         product = cleaned_data.get('product')
-        suser = self.request.session.get('user')
 
-        if quantity and product and suser:
-            with transaction.atomic():
-                prod = Sproduct.objects.get(pk=product)
-                sorder = Sorder(
-                    # 참조키이기때문에 그 모델을 임포트 해야함
-                    quantity=quantity,
-                    product=prod,
-                    suser=Suser.objects.get(email=suser)
-                )
-            print("product121212 : ", product)
-            sorder.save()
-            prod.stock -= quantity
-            prod.save()
-
-            # atomic안에서 발생되는 일들은 트랜잭션으로 처리됨
-
-        else:
-            self.product = product
+        if not (quantity and product):
             self.add_error('quantity', '값이 없습니다.')
             self.add_error('product', '값이 없습니다.')
+            # atomic안에서 발생되는 일들은 트랜잭션으로 처리됨
+
 
 # 트랜잭션으로 만들겠다라는것은
 # 일련의 동작을 하나로 만들겠다

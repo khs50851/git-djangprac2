@@ -23,6 +23,7 @@ class RegisterForm(forms.Form):
         widget=forms.PasswordInput, label='비밀번호 확인'
     )
 
+    # 클린이라는 함수는 유효성 검사만 하는 함수
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
@@ -35,12 +36,6 @@ class RegisterForm(forms.Form):
                 self.add_error('password', '비밀번호가 서로 다릅니다')
                 # 패스워드 필드가 에러메세지 추가
                 self.add_error('re_password', '비밀번호가 서로 다릅니다')
-            else:
-                suser = Suser(
-                    email=email,
-                    password=make_password(password)
-                )
-                suser.save()
 
 
 class LoginForm(forms.Form):
@@ -72,6 +67,3 @@ class LoginForm(forms.Form):
             if not check_password(password, suser.password):
 
                 self.add_error('password', '비밀번호가 틀렸습니다')
-
-            else:
-                self.email = suser.email
