@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
 from django.views.generic import ListView
+from django.utils.decorators import method_decorator
 from .models import Sorder
 from .forms import RegisterForm
+from suser.decorators import login_required
 
 # Create your views here.
 
 
+@method_decorator(login_required, name='dispatch')
 class OrderCreate(FormView):
     form_class = RegisterForm
     success_url = "/product/"
@@ -24,6 +27,8 @@ class OrderCreate(FormView):
     # 리퀘스트라는 변수를 전달할 수 있게 만들어야함
 
 
+# url에 접근했을때 클래스를 호출해주는 함수는 dispatch임
+@method_decorator(login_required, name='dispatch')
 class OrderList(ListView):
     model = Sorder  # 그냥 모델로만 하면 전체 회원의 주문목록이 나옴
     # 세션으로 사용자 정보를 받아와야함
