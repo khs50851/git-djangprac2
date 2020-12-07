@@ -30,7 +30,18 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+BATON = {
+    'SITE_HEADER': '쇼핑몰 백오피스',
+    'SITE_TITLE': '쇼핑몰 백오피스',
+    'INDEX_TITLE': '쇼핑몰 관리자페이지',
+    'SUPPORT_HREF': 'mailto:test@test.com',
+    'COPYRIGHT': 'copyright © 2020 KHS',
+    'POWERD_BY': '<a href="#">쇼핑몰</a>',
+    'MENU_TITLE': '쇼핑몰 페이지',
+}
+
 INSTALLED_APPS = [
+    'baton',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,9 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'rest_framework',
-    'suser',
-    'sproduct',
-    'sorder'
+    'suser.apps.SuserConfig',  # 이렇게 apps안에 suserconfig로 접근해서 표기될 이름을 가져옴
+    'sproduct.apps.SproductConfig',
+    'sorder.apps.SorderConfig',
+    'baton.autodiscover'
 ]
 
 MIDDLEWARE = [

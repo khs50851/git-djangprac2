@@ -8,3 +8,6 @@ class SuserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Suser, SuserAdmin)
+admin.site.site_header = 'HS쇼핑몰'  # 어드민 사이트 이름 변경(왼쪽 상단)
+admin.site.index_title = 'HS쇼핑몰3'
+admin.site.site_title = 'HS쇼핑몰2'
