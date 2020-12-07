@@ -21,6 +21,16 @@ class SproductAdmin(admin.ModelAdmin):
             stock = intcomma(stock)
             return format_html(f'<b><span style="color:red;font-weight:bold">{stock} 개</span></b>')
         return f'{intcomma(stock)} 개'  # f스트링 안에 함수도 쓸수있음
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = {'title': '상품 목록'}
+        return super().changelist_view(request, extra_context)
+
+    # 상세보기가면 위에 나타나는 제목수정
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        product = Sproduct.objects.get(pk=object_id)
+        extra_context = {'title': f'{product.name} 수정하기'}
+        return super().changeform_view(request, object_id, form_url, extra_context)
     price_format.short_description = '가격'
     styled_stock.short_description = '재고'
 

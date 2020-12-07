@@ -17,6 +17,16 @@ class SorderAdmin(admin.ModelAdmin):
             return format_html(f'<span style="color:green;font-weight:bold">{obj.status}</span>')
         return obj.status
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = {'title': '주문 목록'}
+        return super().changelist_view(request, extra_context)
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        sorder = Sorder.objects.get(pk=object_id)
+        extra_context = {
+            'title': f'{sorder.suser.email}의{sorder.product.name} 주문 수정하기'}
+        return super()._changeform_view(request, object_id, form_url, extra_context)
+
     # 함수를 만들면 함수에 대한 속성값을 지정할 수 있음
     styled_status.short_description = '상태'  # 위에도 styled_status이게 아니라 상태로 나오게함
 
