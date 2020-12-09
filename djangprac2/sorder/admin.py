@@ -1,9 +1,12 @@
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import F, Q
+import datetime
 from django.db import transaction
 from django.contrib import admin
+from django.template.response import TemplateResponse
 from django.utils.html import format_html
+from django.urls import path
 from .models import Sorder
 
 # Register your models here.
@@ -42,11 +45,19 @@ refund.short_description = '환불'
 class SorderAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     # 스타일된 스테이터스를 함수로 만들수있음
-    list_display = ('suser', 'product', 'styled_status')
+    list_display = ('suser', 'product', 'styled_status', 'action')
+
+    # 어드민파일에서 내가 만든 html파일을 지정해줄수있음
+    change_list_template = 'admin/order_change_list.html'  # 이렇게 템플릿 파일의 경로 지정
+    change_form_template = 'admin/order_change_form.html'
 
     actions = [  # 안에다가 함수를 넣음
         refund  # 함수 호출
     ]
+
+    def action(self, obj):
+        if obj.status != '환불':
+            return format_html(f'<input type="button" value="환불" onclick="order_refund_submit({obj.id})" class="btn btn-primary btn-sm"></button>')
 
     def styled_status(self, obj):  # 이 함수를 만들고 등록 obj는 각 레코드를 의미
         if obj.status == '환불':
@@ -57,15 +68,57 @@ class SorderAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = {'title': '주문 목록'}
+
+        if request.method == 'POST':
+            obj_id = request.POST.get('obj_id')
+            if obj_id:
+                qs = Sorder.objects.filter(pk=obj_id)
+
+                ct = ContentType.objects.get_for_model(qs.model)
+
+                for obj in qs:
+                    obj.product.stock += obj.quantity
+                    obj.product.save()
+
+                    LogEntry.objects.log_action(
+                        user_id=request.user.id,
+                        content_type_id=ct.pk,
+                        object_id=obj.pk,
+                        object_repr='주문환불',
+                        action_flag=CHANGE,
+                        change_message='주문환불'
+                    )
+                qs.update(status='환불')
         return super().changelist_view(request, extra_context)
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         sorder = Sorder.objects.get(pk=object_id)
         extra_context = {
             'title': f'{sorder.suser.email}의{sorder.product.name} 주문 수정하기'}
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_save_and_add_continue'] = False
         return super()._changeform_view(request, object_id, form_url, extra_context)
 
-    # 함수를 만들면 함수에 대한 속성값을 지정할 수 있음
+    def date_view(self, request):  # 새로운 뷰는 만들어졌는데 이거에 맞는 템플릿 파일을 만들어야함
+        week_date = datetime.datetime.now()-datetime.timedelta(days=7)  # 7일을 뺌
+        week_data = Sorder.objects.filter(regdate__gte=week_date)
+        data = Sorder.objects.filter(regdate__lt=week_date)
+        context = dict(
+            self.admin_site.each_context(request),  # 이렇게 채워줘야함
+            week_data=week_data,
+            data=data
+        )
+        # context에 기본적인게 없어서 원래것보다 비어서 전달됨
+        return TemplateResponse(request, 'admin/order_date_view.html', context)
+        # 함수를 만들면 함수에 대한 속성값을 지정할 수 있음
+
+    # 주소를 추가하자
+    def get_urls(self):
+        urls = super().get_urls()
+        date_urls = [  # 새로 추가할 url
+            path('date_view/', self.date_view),
+        ]
+        return date_urls+urls  # 기존에 생성된 urls랑 내가만든 date_urls 반환
     styled_status.short_description = '상태'  # 위에도 styled_status이게 아니라 상태로 나오게함
 
 

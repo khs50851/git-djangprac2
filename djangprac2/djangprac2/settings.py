@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,6 +38,44 @@ BATON = {
     'COPYRIGHT': 'copyright © 2020 KHS',
     'POWERD_BY': '<a href="#">쇼핑몰</a>',
     'MENU_TITLE': '쇼핑몰 페이지',
+    'MENU': (
+        {'type': 'title', 'label': 'main', 'apps': (
+            'suser', 'sorder', 'sproduct')},
+        {
+            'type': 'app',
+            'name': 'suser',
+            'label': '사용자',
+            'icon': 'fa fa-lock',
+            'models': (
+                {
+                    'name': 'suser',
+                    'label': '사용자'
+                },
+            )
+        },
+        {
+            'type': 'free', 'label': '주문', 'default_open': True, 'children': [
+                {'type': 'model', 'label': '주문', 'name': 'sorder', 'app': 'sorder'},
+                {'type': 'free', 'label': '주문',
+                    'url': '/admin/sorder/sorder/'},
+                {'type': 'free', 'label': '주문 날짜 뷰',
+                    'url': '/admin/sorder/sorder/date_view/'}
+
+            ]
+        },
+        {
+            'type': 'app',
+            'name': 'sproduct',
+            'label': '상품',
+            'models': (
+                {
+                    'name': 'sproduct',
+                    'label': '상품'
+                },
+            )
+        },
+        {'type': 'free', 'label': '매뉴얼', 'url': '/admin/manual'},
+    ),
 }
 
 INSTALLED_APPS = [
@@ -71,8 +109,11 @@ ROOT_URLCONF = 'djangprac2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            # 프로젝트 안에 템플릿을 찾도록 경로지정 # os.path.join은 경로를 연결
+            os.path.join(BASE_DIR, 'templates')
+        ],
+        'APP_DIRS': True,  # 각 앱들 안에있는 템플릿 폴더를 찾아보는거
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

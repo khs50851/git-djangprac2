@@ -1,0 +1,19 @@
+{% extends 'admin/change_list.html' %} <!-- 기존의 장고 라이브러리 안에 기본적으로 만들어진거를 확장 -->
+{% load static %}
+
+{% block extrahead %}
+{{block.super}} <!-- 이거 생략하면 기존에 있던거 실행 안해서 호출 꼭 해야함  -->
+<script>
+    function order_refund_submit(obj_id){
+        jQuery("#changelist-form").append('<input type="hidden" name="obj_id" value="'+obj_id+'">');
+        jQuery("#changelist-form").submit();
+    }
+        
+</script>
+
+{% endblock %}
+
+{% block search %}
+<a class="btn btn-primary mb-1" href="/admin/sorder/sorder/date_view">날짜뷰 보기</a>
+{{block.super}}
+{% endblock %}
